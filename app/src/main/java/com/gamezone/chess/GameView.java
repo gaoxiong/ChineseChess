@@ -26,20 +26,20 @@ import android.widget.Toast;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   Main_Activity father;
   Bitmap[][] chessBitmap;//ÏóÆåÆå×ÓÍ¼Æ¬
-  Bitmap chessZouQiflag;//±êÖ¾×ßÆå
+  Bitmap chessChosenFlag;//±êÖ¾×ßÆå
   Bitmap paotai;//ÅÚÌ¨
   Bitmap paotai2;//ÅÚÌ¨±ßÑØµÄÊ±ºò
   Bitmap paotai1;
   Bitmap chuhe;//³þºÓÍ¼Æ¬
   Paint paint;//»­±Ê
-  Bitmap chessQipan2;//ÆåÅÌ±ß¿ò
+  Bitmap chessQipanBg;//ÆåÅÌ±ß¿ò
   Bitmap huiqi;//»ÚÆåÍ¼Æ¬
   Bitmap chonWan;//ÖØÍæÎÄ×Ö
   Bitmap[] iscore=new Bitmap[10];//Êý×ÖÍ¼
   Bitmap dunhao;//¶ÙºÅ
-  Bitmap beijint;//±³¾°Í¼
-  Bitmap minueBeijint;//²Ëµ¥±³¾°Í¼
-  Bitmap ifPlayChess;//±êÊ¶ÏÂÆå·½µÄ±³¾°
+  Bitmap bgImage;//±³¾°Í¼
+  Bitmap menuBg;//²Ëµ¥±³¾°Í¼
+  Bitmap iconLeftBottom;//±êÊ¶ÏÂÆå·½µÄ±³¾°
   Bitmap isPlaySound;//¿ªÆôÉùÒô
   Bitmap noPlaySound;//¹Ø±ÕÉùÒô
   Bitmap start;//¿ªÊ¼
@@ -53,8 +53,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   Bitmap loseJiemian;//Êä½çÃæ
   Bitmap fugaiTu;//¸²¸ÇÍ¼
   Bitmap queDinButton;//È·¶¨°´Å¥
-  Bitmap beijint3;//ÍÏ¶¯Ìõ±³¾°
-  Bitmap beijint4;//¼ô²Ã¿ò±³¾°
+  Bitmap hardCountChooseBgOutline;//ÍÏ¶¯Ìõ±³¾°
+  Bitmap bgZoomOutline;//¼ô²Ã¿ò±³¾°
   int[][] color=new int[20][3];
   int length;//ÄÑ¶ÈÊý
   int huiqibushu=0;
@@ -66,7 +66,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   Stack<StackPlayChess> stack=new Stack<StackPlayChess>();
   float xMove;
   float yMove;//ÒÆ¶¯×ø±ê
-  boolean cMfleg=true;//´¥ÃþÊÇ·ñÓÐÐ§
+  boolean isPlayerPlaying =true;//´¥ÃþÊÇ·ñÓÐÐ§
   boolean isFlage;//ÊÇ·ñÎªµÚÒ»´ÎÏÂÆå
   boolean xzflag = false;//ÊÇ·ñÎªÑ¡ÖÐ£¬Ñ¡ÖÐÖÐÐèÒªÒÆ¶¯µÄ»°¾Í»æÖÆÒÆ¶¯
   boolean threadFlag=true;//Ïß³ÌÊÇ·ñÔËÐÐ
@@ -110,29 +110,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   public void onDraw(Canvas canvas)
   {
     canvas.drawColor(Color.argb(255, 0, 0, 0));
-    canvas.drawBitmap(beijint,startX,startY, null);
+    canvas.drawBitmap(bgImage, startX, 0, null);
 
-    if(isNoStart)//Èç¹û¿ªÊ¼ÁË
-    {
-      onDrawWindowindow(canvas,ViewConsts.startX,ViewConsts.startY);
-      if(flag)
-      {
+    if (isNoStart) {
+      onDrawWindowindow(canvas, ViewConsts.startX, ViewConsts.startY);
+      if(flag) {
         float left=xMove>startX+5*xSpan?windowXstartLeft:windowXstartRight;
         float top=windowYstart;
         float right=left+windowWidth;
         float bottom=top+windowHeight;
         canvas.save();
         canvas.clipRect(new RectF(left,top,right,bottom));
-        onDrawWindowindow(canvas,xStartCK,yStartCK);//Ð¡´°¿Ú
+        onDrawWindowindow(canvas, xStartCK, yStartCK);//Ð¡´°¿Ú
         canvas.restore();
-        canvas.drawBitmap(beijint4,left-6,top-6, null);
+        canvas.drawBitmap(bgZoomOutline,left-6,top-6, null);
       }
-
-    }else
-    {
-      canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))],startX,startY, null);
+    } else {
+      canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))],startX, startY, null);
     }
-
 
     onDrawWindowMenu(canvas,ViewConsts.startX,ViewConsts.startY);
     if(yingJMFlag)//Èç¹ûÊÇÓ®ÁË
@@ -158,7 +153,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   public void onDrawWindowindow(Canvas canvas,float startX,float startY)
   {
-    canvas.drawBitmap(chessQipan2,startX,startY, null);
+    canvas.drawBitmap(chessQipanBg, startX, startY, null);
 
     //»æÖÆºìÉ«Ìî³ä¾ØÐÎ
     paint.setColor(Color.RED);//ÉèÖÃ»­±ÊÑÕÉ«
@@ -222,18 +217,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     if(flag)//»æÖÆÍÏÀ­Ð§¹û
     {
       //»æÖÆÑ¡ÖÐÒª×ßÆå×ÓµÄ±êÖ¾
-      canvas.drawBitmap(chessZouQiflag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.SRC(xzgz))-2)*xSpan-chessR,
+      canvas.drawBitmap(chessChosenFlag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.SRC(xzgz))-2)*xSpan-chessR,
         startY+(ChessLoadUtil.RANK_Y(ChessLoadUtil.SRC(xzgz))-2)*ySpan-chessR, null);
-      canvas.drawBitmap(chessZouQiflag,startX+(bzcol+1)*xSpan-chessR,
+      canvas.drawBitmap(chessChosenFlag,startX+(bzcol+1)*xSpan-chessR,
         startY+(bzrow+1)*ySpan-chessR, null);//»æÖÆÒÆ¶¯Ê±ÒÆ¶¯µ½µÄÄ³¸ñ
 
     }
-    if(cMfleg&&stack.size()>0)//»æÖÆµçÄÔÏÂÆåµÄ±êÖ¾
+    if(isPlayerPlaying &&stack.size()>0)//»æÖÆµçÄÔÏÂÆåµÄ±êÖ¾
     {
-      canvas.drawBitmap(chessZouQiflag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.SRC(mvResult))-2)*xSpan-chessR,
+      canvas.drawBitmap(chessChosenFlag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.SRC(mvResult))-2)*xSpan-chessR,
         startY+(ChessLoadUtil.RANK_Y(ChessLoadUtil.SRC(mvResult))-2)*ySpan-chessR, null);
 
-      canvas.drawBitmap(chessZouQiflag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.DST(mvResult))-2)*xSpan-chessR,
+      canvas.drawBitmap(chessChosenFlag,startX+(ChessLoadUtil.FILE_X(ChessLoadUtil.DST(mvResult))-2)*xSpan-chessR,
         startY+(ChessLoadUtil.RANK_Y(ChessLoadUtil.DST(mvResult))-2)*ySpan-chessR, null);
     }
     if(flag)
@@ -247,92 +242,126 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   public void onDrawWindowMenu(Canvas canvas,float startX,float startY)
   {
+    canvas.drawBitmap(scaleToFit(menuBg, 1f), startX, startY + 11.0f * ySpan, null);//²Ëµ¥±³¾°Í¼
+    //canvas.drawBitmap(iconLeftBottom, startX + 0.5f * xSpan, startY + 11.4f * ySpan, null);
 
-
-    canvas.drawBitmap(scaleToFit(minueBeijint,1f),startX,startY+11.0f*ySpan, null);//²Ëµ¥±³¾°Í¼
-
-    canvas.drawBitmap(ifPlayChess,startX+1f*xSpan,startY+11.4f*ySpan, null);
-
-    if(playChessflag)//Èç¹ûÊÇºì·½ÏÂÆå
-    {
-      canvas.drawBitmap(scaleToFit(chessBitmap[1][0],0.9f),startX+1.1f*xSpan,startY+11.45f*ySpan, null);
-    }else{
-      canvas.drawBitmap(scaleToFit(chessBitmap[0][0],0.9f),startX+1.1f*xSpan,startY+11.45f*ySpan, null);
+    float buttonY = startY + 11.6f * ySpan;
+    float scale = 0.7f;
+    float chessBuffer = 0.5f;
+    if (playChessflag) {
+      canvas.drawBitmap(scaleToFit(chessBitmap[0][0], 0.9f),
+        startX + chessBuffer * xSpan,
+        buttonY - 0.05f * ySpan, null);
+    } else {
+      canvas.drawBitmap(scaleToFit(chessBitmap[1][0], 0.9f),
+        startX + chessBuffer * xSpan,
+        buttonY - 0.05f * ySpan, null);
     }
 
     //»æÖÆÊ±¼ä
-    drawScoreStr(canvas,endTime/1000/60<10?"0"+endTime/1000/60:endTime/1000/60+"",
-      startX+3f*xSpan,startY+11.4f*ySpan);
-    canvas.drawBitmap(dunhao,startX+scoreWidth*2+3f*xSpan,startY+11.4f*ySpan, null);//¶ÙºÅ
-    drawScoreStr(canvas,endTime/1000%60<10?"0"+endTime/1000%60:endTime/1000%60+"",
-      scoreWidth*3+startX+3f*xSpan,startY+11.4f*ySpan);
+//    drawScoreStr(canvas,endTime/1000/60<10?"0"+endTime/1000/60:endTime/1000/60+"",
+//      startX+3f*xSpan,startY+11.4f*ySpan);
+//    canvas.drawBitmap(dunhao,startX+scoreWidth*2+3f*xSpan,startY+11.4f*ySpan, null);//¶ÙºÅ
+//    drawScoreStr(canvas,endTime/1000%60<10?"0"+endTime/1000%60:endTime/1000%60+"",
+//      scoreWidth*3+startX+3f*xSpan,startY+11.4f*ySpan);
 
-
-    if(huiqiFlag)//ÊÇ·ñ°´ÏÂÁË»ÚÆå°´Å¥
-    {
-      canvas.drawBitmap(scaleToFit(huiqi,1.2f),startX+6.9f*xSpan,startY+11.25f*ySpan, null);//»ÚÆå
-    }else{
-      canvas.drawBitmap(huiqi,startX+7f*xSpan,startY+11.35f*ySpan, null);//»ÚÆå
-    }
-
-    canvas.drawBitmap(scaleToFit(minueBeijint,1f),startX,startY+12.8f*ySpan, null);//²Ëµ¥±³¾°Í¼
-    if(chonwanFlag)//ÐÂ¾Ö
-    {
-      canvas.drawBitmap(scaleToFit(chonWan,1.2f),startX+0.3f*xSpan,startY+12.9f*ySpan, null);//ÖØÍæ
-    }
-    else
-    {
-      canvas.drawBitmap(chonWan,startX+0.8f*xSpan,startY+13.2f*ySpan, null);//ÖØÍæ
-    }
-    if(isNoStart)//¿ªÊ¼ÔÝÍ££¬Èç¹ûÒÑ¾­¿ªÊ¼
-    {
-      if(dianjiKaiShi)//Èç¹ûµã»÷´Ë´¦ÁË
-      {
-        canvas.drawBitmap(scaleToFit(suspend,1.2f),startX+3.0f*xSpan,startY+13.0f*ySpan, null);
-      }else
-        canvas.drawBitmap(suspend,startX+3.3f*xSpan,startY+13.2f*ySpan, null);
-    }
-    else{
-      if(dianjiKaiShi)//Èç¹ûµã»÷´Ë´¦ÁË
-      {
-        canvas.drawBitmap(scaleToFit(start,1.2f),startX+3.0f*xSpan,startY+13.0f*ySpan, null);
-      }else
-        canvas.drawBitmap(start,startX+3.3f*xSpan,startY+13.2f*ySpan, null);
+    //canvas.drawBitmap(scaleToFit(menuBg,1f),startX,startY+12.8f*ySpan, null);//²Ëµ¥±³¾°Í¼
+    float againBuffer = chessBuffer + 1.1f;
+    float addinBuffer = 1.8f;
+    if(chonwanFlag) {
+      canvas.drawBitmap(scaleToFit(chonWan, scale),
+        startX + againBuffer * xSpan,
+        buttonY, null);//ÖØÍæ
+    } else {
+      canvas.drawBitmap(scaleToFit(chonWan, scale),
+        startX + againBuffer * xSpan,
+        buttonY, null);//ÖØÍæ
     }
 
-    if(!isNoStart)//ÄÑ¶ÈÊÇ·ñ¿ÉÑ¡£¬Èç¹û¿ÉÑ¡£¬Ôò±íÊ¾µ±Ç°×´Ì¬ÏÂ¿ÉÒÔµã»÷£¬ÎªÔÝÍ£×´Ì¬ÏÂÊÇÎª¿ÉÑ¡
-    {
-      if(dianjiNanDu)
-      {
-        canvas.drawBitmap(scaleToFit(nandutiaoZ,1.2f),startX+5.5f*xSpan,startY+13.0f*ySpan, null);
-      }else
-        canvas.drawBitmap(nandutiaoZ,startX+5.8f*xSpan,startY+13.2f*ySpan, null);
+    float startBuffer = againBuffer + addinBuffer;
+    if(isNoStart) {
+      if(dianjiKaiShi) {
+        canvas.drawBitmap(scaleToFit(suspend, scale),
+          startX + startBuffer * xSpan,
+          buttonY,
+          null);
+      } else {
+        canvas.drawBitmap(scaleToFit(suspend, scale),
+          startX + startBuffer * xSpan,
+          buttonY,
+          null);
+      }
+    } else {
+      if(dianjiKaiShi) {
+        canvas.drawBitmap(scaleToFit(start, scale),
+          startX + startBuffer * xSpan,
+          buttonY,
+          null);
+      } else {
+        canvas.drawBitmap(scaleToFit(start, scale),
+          startX + startBuffer * xSpan,
+          buttonY,
+          null);
+      }
     }
-    else
-    {
 
-      canvas.drawBitmap(nonandutiaoZ,startX+5.8f*xSpan,startY+13.2f*ySpan, null);
+    float nanduBuffer = startBuffer + addinBuffer;
+    if (!isNoStart) {
+      if(dianjiNanDu) {
+        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
+          startX + nanduBuffer * xSpan,
+          buttonY, null);
+      } else {
+        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
+          startX + nanduBuffer * xSpan,
+          buttonY, null);
+      }
+    } else {
+      canvas.drawBitmap(scaleToFit(nonandutiaoZ, scale),
+        startX + nanduBuffer * xSpan,
+        buttonY, null);
     }
 
-    if(isNoPlaySound)//ÊÇ·ñ¿ªÆôÉùÒô,Èç¹ûÊÇÒÑ¾­¿ªÆôÁËÉùÒô
-    {
-      if(dianjishengyin)
-      {
-        canvas.drawBitmap(scaleToFit(isPlaySound,1.2f),startX+8.0f*xSpan,startY+13.1f*ySpan, null);
-      }else
-        canvas.drawBitmap(isPlaySound,startX+8.3f*xSpan,startY+13.2f*ySpan, null);
-    }else{
-      if(dianjishengyin)
-      {
-        canvas.drawBitmap(scaleToFit(noPlaySound,1.2f),startX+8.0f*xSpan,startY+13.1f*ySpan, null);
-      }else
-        canvas.drawBitmap(noPlaySound,startX+8.3f*xSpan,startY+13.2f*ySpan, null);
+    float huiqiBuffer = nanduBuffer + addinBuffer;
+    if (huiqiFlag) {
+      canvas.drawBitmap(scaleToFit(huiqi, scale),
+        startX + huiqiBuffer * xSpan,
+        buttonY,
+        null);//»ÚÆå
+    } else {
+      canvas.drawBitmap(scaleToFit(huiqi, scale),
+        startX + huiqiBuffer * xSpan,
+        buttonY,
+        null);//»ÚÆå
+    }
+
+    float soundBuffer = huiqiBuffer + addinBuffer;
+    if(isNoPlaySound) {
+      if(dianjishengyin) {
+        canvas.drawBitmap(scaleToFit(isPlaySound, scale),
+          startX + soundBuffer * xSpan,
+          buttonY, null);
+      } else {
+        canvas.drawBitmap(scaleToFit(isPlaySound, scale),
+          startX + soundBuffer * xSpan,
+          buttonY, null);
+      }
+    } else {
+      if(dianjishengyin) {
+        canvas.drawBitmap(scaleToFit(noPlaySound, scale),
+          startX + soundBuffer * xSpan,
+          buttonY, null);
+      } else {
+        canvas.drawBitmap(scaleToFit(noPlaySound, scale),
+          startX + soundBuffer * xSpan,
+          buttonY, null);
+      }
     }
 
     if(!isNoStart&&nanduBXZ)//Èç¹ûÎª°´ÏÂÁËÄÑ¶È
     {
 
-      canvas.drawBitmap(beijint3,startX,startY+14.6f*ySpan, null);
+      canvas.drawBitmap(hardCountChooseBgOutline,startX,startY+14.6f*ySpan, null);
       Rect r=new Rect(50,50,200,200);
 
       if(dianjiJDT)
@@ -368,7 +397,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
     }else
     {
-      canvas.drawBitmap(minueBeijint,startX,startY+14.6f*ySpan, null);
+      canvas.drawBitmap(menuBg,startX,startY+14.6f*ySpan, null);
       //»æÖÆ¹ã¸æ
       float left=startX+40*xZoom;
       float top=startY+15f*ySpan;
@@ -408,10 +437,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   }
   public void initBitmap()
   {
-    float xZoom=ViewConsts.xZoom;
+    float xZoom = ViewConsts.xZoom;
 
-    beijint4=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijingkuangtu),xZoom);//¼ô²Ã¿ò
-    beijint3=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijing3),xZoom);//ÄÑ¶ÈÑ¡ÔñÍÏ¶¯Ëü±³¾°
+    bgZoomOutline = scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijingkuangtu),xZoom);//¼ô²Ã¿ò
+    hardCountChooseBgOutline =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijing3),xZoom);//ÄÑ¶ÈÑ¡ÔñÍÏ¶¯Ëü±³¾°
     fugaiTu=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.shuyingfugai),xZoom);//¸²¸ÇÍ¼
     winJiemian=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.yingjiemian),xZoom);//Ó®½çÃæ
     loseJiemian=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.shuijiemian),xZoom);//Êä½çÃæ
@@ -425,15 +454,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     start=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.start),xZoom);//¿ªÊ¼
     isPlaySound=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.kaiqishengy),xZoom);//¿ªÆôÉùÒôÍ¼Æ¬
     noPlaySound=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.guanbishengy),xZoom);//¹Ø±ÕÉùÒôÍ¼Æ¬
-    ifPlayChess=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.caidanxiaqifang),xZoom);//²Ëµ¥ÏÂÆå·½±³¾°Í¼
-    minueBeijint=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijing),xZoom);//²Ëµ¥±³¾°Í¼
-    beijint=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijintu),xZoom);//±³¾°Í¼
+    iconLeftBottom =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.caidanxiaqifang),xZoom);//²Ëµ¥ÏÂÆå·½±³¾°Í¼
+    menuBg =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijing),xZoom);//²Ëµ¥±³¾°Í¼
+    bgImage =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.beijintu),xZoom);//±³¾°Í¼
     chonWan=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.chonwan),xZoom);//ÖØÍæ
-    huiqi=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.huiqi),xZoom);//»ÚÆå
+    huiqi = scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.huiqi), xZoom);//»ÚÆå
 
-    chessQipan2=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.floor2),xZoom);//ÆåÅÌ
+    chessQipanBg =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.floor2),xZoom);//ÆåÅÌ
     chuhe=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.chuhe),xZoom);//³þºÓ
-    chessZouQiflag=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.selected),xZoom);//±êÖ¾Î»
+    chessChosenFlag =scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.selected),xZoom);//±êÖ¾Î»
     iscore[0] = scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.d0),xZoom);//Êý×ÖÍ¼
     iscore[1] = scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.d1),xZoom);
     iscore[2] = scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.d2),xZoom);
@@ -452,7 +481,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     paotai2=scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.paotai2),xZoom);//ÅÚÌ¨2
     xZoom=ViewConsts.xZoom*0.9f;
 
-    chessBitmap=new Bitmap[][]{//Æå×Ó
+    chessBitmap=new Bitmap[][] {//Æå×Ó
       {
         scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.bk),xZoom),
         scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.ba),xZoom),
@@ -463,16 +492,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.bp),xZoom),
 
       },{
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rk),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.ra),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rb),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rn),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rr),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rc),xZoom),
-      scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rp),xZoom),
-    }
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rk),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.ra),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rb),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rn),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rr),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rc),xZoom),
+        scaleToFit(BitmapFactory.decodeResource(getResources(), R.drawable.rp),xZoom),
+      }
     };
   }
+
   @Override
   public void surfaceChanged(SurfaceHolder holder, int format, int width,
                              int height) {}
@@ -482,21 +512,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     this.holder=holder;
     canvas = null;
     try {
-      // Ëø¶¨Õû¸ö»­²¼£¬ÔÚÄÚ´æÒªÇó±È½Ï¸ßµÄÇé¿öÏÂ£¬½¨Òé²ÎÊý²»ÒªÎªnull
-      canvas = holder.lockCanvas(null);
-      synchronized (holder) {
-
-        onDraw(canvas);//»æÖÆ
-      }
+        // Ëø¶¨Õû¸ö»­²¼£¬ÔÚÄÚ´æÒªÇó±È½Ï¸ßµÄÇé¿öÏÂ£¬½¨Òé²ÎÊý²»ÒªÎªnull
+        canvas = holder.lockCanvas(null);
+        synchronized (holder) {
+          onDraw(canvas);//»æÖÆ
+        }
     } finally {
       if (canvas != null) {
         //²¢ÊÍ·ÅËø
         holder.unlockCanvasAndPost(canvas);
       }
     }
-    newThread();
-
+    // time calc
+    //newThread();
   }
+
   public void newThread()
   {
     new Thread(){
@@ -507,27 +537,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         {
           if(isNoStart)
           {
-            if(endTime-500<0)
+            if (endTime - 500<0)
             {
-              if(!cMfleg)//Èç¹ûµçÄÔÕýÔÚÏÂÆå£¬Ê±¼ä¶àÁË£¬ÔòÎªµçÄÔÊäÁË
+              if (!isPlayerPlaying)//Èç¹ûµçÄÔÕýÔÚÏÂÆå£¬Ê±¼ä¶àÁË£¬ÔòÎªµçÄÔÊäÁË
               {
-                yingJMFlag=true;
+                yingJMFlag = true;
                 LoadUtil.Startup();//³õÊ¼»¯ÆåÅÌ
                 initArrays();//³õÊ¼»¯Êý×é
                 endTime=zTime;
                 isNoStart=false;
                 dianjiJDT=false;
-              }else{//ÔòÎª×Ô¼ºÊäÁË
+              } else {//ÔòÎª×Ô¼ºÊäÁË
                 shuJMFlag=true;
                 LoadUtil.Startup();//³õÊ¼»¯ÆåÅÌ
                 initArrays();//³õÊ¼»¯Êý×é
                 endTime=zTime;
                 isNoStart=false;
                 dianjiJDT=false;
-
               }
-            }else
-            {
+            } else {
               endTime-=500;
             }
           }
@@ -550,17 +578,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   }
   @Override
   public void surfaceDestroyed(SurfaceHolder holder) {}
-  @Override
-  public boolean onTouchEvent(MotionEvent e){
 
-    if(!cMfleg)//Èç¹ûÕýÔÚ½øÐÐµçÄÔÏÂÆå
-    {
+  @Override
+  public boolean onTouchEvent(MotionEvent e) {
+    if (!isPlayerPlaying) {
       return false;
     }
 
-    int col = (int)( (e.getX()-startX)/xSpan);
-    int row = (int) ((e.getY()-startY)/ySpan);
-    if(	((e.getX()-col*xSpan-startX)*(e.getX()-col*xSpan-startX)+
+    int col = (int) ((e.getX() - startX) / xSpan);
+    int row = (int) ((e.getY() - startY) / ySpan);
+
+    if (((e.getX() - col * xSpan - startX) * (e.getX() - col * xSpan - startX) +
       (e.getY()-row*ySpan-startY)*(e.getY()-row*ySpan-startY))<xSpan/2*xSpan/2)
     {
       bzcol=col-1;
@@ -585,7 +613,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       bzcol=col;
       bzrow=row-1;
     }
-    if(e.getAction()==MotionEvent.ACTION_DOWN)//Èç¹û°´ÏÂ
+
+    if(e.getAction() == MotionEvent.ACTION_DOWN)//Èç¹û°´ÏÂ
     {
       if(yingJMFlag||shuJMFlag)//Èç¹ûµ±Ç°ÎªÓ®½çÃæ
       {
@@ -903,7 +932,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
                 {
                   endTime=zTime;//Ê±¼ä³õÊ¼»¯
                   playChessflag=true;//ÕýÔÚÏÂÆå
-                  cMfleg=false;//ÕýÔÚÏÂÆå±êÖ¾
+                  isPlayerPlaying =false;//ÕýÔÚÏÂÆå±êÖ¾
                   onDrawcanvas();//ÖØ»æ·½·¨
                   //µçÄÔ×ßÆå
                   SearchMain();
@@ -921,7 +950,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
                     father.playSound(5,1);//b²¥·ÅÉùÒô,ÊäÁË
                   }else
                     father.playSound(2,1);//b²¥·ÅÉùÒô,µçÄÔÏÂÆåÁË
-                  cMfleg=true;//ÏÂÍêÆå×Ó£¬Íæ¼Ò¿ÉÒÔ²Ù¿ØÁË¡£
+                  isPlayerPlaying =true;//ÏÂÍêÆå×Ó£¬Íæ¼Ò¿ÉÒÔ²Ù¿ØÁË¡£
                   playChessflag=false;
                   endTime=zTime;
                   onDrawcanvas();//ÖØ»æ·½·¨

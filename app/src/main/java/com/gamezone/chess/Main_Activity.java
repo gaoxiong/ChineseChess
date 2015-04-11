@@ -80,7 +80,7 @@ public class Main_Activity extends Activity {
       xZoom = yZoom = zoomx;
     }
     startX = (width - 480 * xZoom) / 2;
-    startY = (height - 800 * yZoom) / 2;
+    startY = (height - 800 * yZoom) / 2 + yBuffer;
     initChessViewFinal();
   }
 
