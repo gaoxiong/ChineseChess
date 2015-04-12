@@ -84,6 +84,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   boolean nanduBXZ;
   int bzcol;
   int bzrow;
+
+  float buttonY;
+  float chessBuffer = 0.5f;
+  float roundBuffer = 1.1f;
+  float scale = 0.7f;
+  float againBuffer;
+  float addinBufferX;
+  float spaceBufferX;
+  float spaceBufferY;
+  float startBuffer;
+  float nanduBuffer;
+  float huiqiBuffer;
+  float soundBuffer;
+
   public GameView(Context context) {
     super(context);
     this.father=(Main_Activity)context;
@@ -245,9 +259,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     canvas.drawBitmap(scaleToFit(menuBg, 1f), startX, startY + 11.0f * ySpan, null);//²Ëµ¥±³¾°Í¼
     //canvas.drawBitmap(iconLeftBottom, startX + 0.5f * xSpan, startY + 11.4f * ySpan, null);
 
-    float buttonY = startY + 11.6f * ySpan;
-    float scale = 0.7f;
-    float chessBuffer = 0.5f;
+    buttonY = startY + 11.6f * ySpan;
     if (playChessflag) {
       canvas.drawBitmap(scaleToFit(chessBitmap[0][0], 0.9f),
         startX + chessBuffer * xSpan,
@@ -266,8 +278,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 //      scoreWidth*3+startX+3f*xSpan,startY+11.4f*ySpan);
 
     //canvas.drawBitmap(scaleToFit(menuBg,1f),startX,startY+12.8f*ySpan, null);//²Ëµ¥±³¾°Í¼
-    float againBuffer = chessBuffer + 1.1f;
-    float addinBuffer = 1.8f;
+    againBuffer = chessBuffer + roundBuffer;
+    addinBufferX = 1.8f;
+    spaceBufferY = 0.68f;
+    spaceBufferX = addinBufferX - 1.5f;
     if(chonwanFlag) {
       canvas.drawBitmap(scaleToFit(chonWan, scale),
         startX + againBuffer * xSpan,
@@ -278,7 +292,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         buttonY, null);//ÖØÍæ
     }
 
-    float startBuffer = againBuffer + addinBuffer;
+    startBuffer = againBuffer + addinBufferX;
     if(isNoStart) {
       if(dianjiKaiShi) {
         canvas.drawBitmap(scaleToFit(suspend, scale),
@@ -305,7 +319,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       }
     }
 
-    float nanduBuffer = startBuffer + addinBuffer;
+    nanduBuffer = startBuffer + addinBufferX;
     if (!isNoStart) {
       if(dianjiNanDu) {
         canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
@@ -322,7 +336,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         buttonY, null);
     }
 
-    float huiqiBuffer = nanduBuffer + addinBuffer;
+    huiqiBuffer = nanduBuffer + addinBufferX;
     if (huiqiFlag) {
       canvas.drawBitmap(scaleToFit(huiqi, scale),
         startX + huiqiBuffer * xSpan,
@@ -335,9 +349,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         null);//»ÚÆå
     }
 
-    float soundBuffer = huiqiBuffer + addinBuffer;
-    if(isNoPlaySound) {
-      if(dianjishengyin) {
+    soundBuffer = huiqiBuffer + addinBufferX;
+    if (isNoPlaySound) {
+      if (dianjishengyin) {
         canvas.drawBitmap(scaleToFit(isPlaySound, scale),
           startX + soundBuffer * xSpan,
           buttonY, null);
@@ -347,7 +361,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
           buttonY, null);
       }
     } else {
-      if(dianjishengyin) {
+      if (dianjishengyin) {
         canvas.drawBitmap(scaleToFit(noPlaySound, scale),
           startX + soundBuffer * xSpan,
           buttonY, null);
@@ -579,6 +593,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   @Override
   public void surfaceDestroyed(SurfaceHolder holder) {}
 
+
   @Override
   public boolean onTouchEvent(MotionEvent e) {
     if (!isPlayerPlaying) {
@@ -616,7 +631,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
     if(e.getAction() == MotionEvent.ACTION_DOWN)//Èç¹û°´ÏÂ
     {
-      if(yingJMFlag||shuJMFlag)//Èç¹ûµ±Ç°ÎªÓ®½çÃæ
+      if (yingJMFlag || shuJMFlag)
       {
         if(e.getX()>startX+3.9f*xSpan&&e.getY()>startY+8.5f*ySpan&&//Ë­ÏÈÏÂ
           e.getY()<startY+8.5f*ySpan+1.5f*ySpan&&e.getX()<startX+3.9f*xSpan+2*xSpan)
@@ -626,34 +641,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
         return true;
       }
-      if(e.getX()>startX+0.5f*xSpan&&e.getY()>startY+13.3f*ySpan&&//ÐÂ¾Ö±êÖ¾
-        e.getY()<startY+13.3f*ySpan+1*ySpan&&e.getX()<startX+0.5f*xSpan+2*xSpan)
-      {
-        chonwanFlag=true;
+      if (e.getX() > startX + againBuffer * xSpan &&
+        e.getX() < startX + (startBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        chonwanFlag = true;
         return true;
       }
-      if(e.getX()>startX+7f*xSpan&&e.getY()>startY+11.5f*ySpan&&//»ÚÆå±êÖ¾
-        e.getY()<startY+11.5f*ySpan+1*ySpan&&e.getX()<startX+7f*xSpan+2*xSpan)
-      {
-        huiqiFlag=true;
+      if(e.getX() > startX + startBuffer * xSpan &&
+        e.getX() < startX + (nanduBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        dianjiKaiShi = true;
         return true;
       }
-      if(e.getX()>startX+3.3f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-        e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+3.3f*xSpan+2*xSpan)//¿ªÊ¼ÇøÓò
-      {
-        dianjiKaiShi=true;
+      if(e.getX() > startX + nanduBuffer * xSpan &&
+        e.getX() < startX + (huiqiBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        dianjiNanDu = true;
         return true;
       }
-      if(e.getX()>startX+5.8f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-        e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+5.8f*xSpan+2*xSpan)//ÄÑ¶ÈÇøÓò
-      {
-        dianjiNanDu=true;
+      if(e.getX() > startX + huiqiBuffer * xSpan &&
+        e.getX() < startX + (soundBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        huiqiFlag = true;
         return true;
       }
-      if(e.getX()>startX+8.3f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-        e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+8.3f*xSpan+2*xSpan)//ÉùÒôÇøÓò
-      {
-        dianjishengyin=true;
+      if(e.getX() > startX + soundBuffer * xSpan &&
+        e.getX() < startX + (soundBuffer + roundBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        dianjishengyin = true;
         return true;
       }
 
@@ -788,87 +808,78 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       }
 
 
-      if(e.getX()>startX+0.5f*xSpan&&e.getY()>startY+13.3f*ySpan&&//ÐÂ¾Ö±êÖ¾
-        e.getY()<startY+13.3f*ySpan+1*ySpan&&e.getX()<startX+0.5f*xSpan+2*xSpan)
-      {
-        if(chonwanFlag==true)
-        {
-
-          shuJMFlag=false;
-          yingJMFlag=false;
-          isNoStart=false;
-          endTime=zTime;
+      if (e.getX() > startX + againBuffer * xSpan &&
+        e.getX() < startX + (startBuffer - spaceBufferX) * xSpan &&
+        e.getY() > buttonY &&
+        e.getY() < buttonY + spaceBufferY * xSpan) {
+        if(chonwanFlag == true) {
+          Toast.makeText(father, "chonwan button clicked", Toast.LENGTH_SHORT).show();
+          shuJMFlag = false;
+          yingJMFlag = false;
+          isNoStart = false;
+          endTime = zTime;
           stack.clear();
           LoadUtil.Startup();//³õÊ¼»¯ÆåÅÌ
           initArrays();//³õÊ¼»¯Êý×é
         }
-
         chonwanFlag=false;
         onDrawcanvas();//ÖØ»æ·½·¨
         return true;
-      }
-      else if(chonwanFlag)
-      {
-        chonwanFlag=false;
+      } else if (chonwanFlag) {
+        chonwanFlag = false;
         onDrawcanvas();//ÖØ»æ·½·¨
         return true;
       }
 
-      if(dianjiKaiShi)//¿ªÊ¼
-      {
-        if(e.getX()>startX+3.3f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-          e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+3.3f*xSpan+2*xSpan)//¿ªÊ¼ÇøÓò
-        {
-          //¸Ã´¦Îª½Óµã»÷¿ªÊ¼Ê±¸ù¾Ý²»Í¬Çé¿ö×ö²»Í¬²Ù×÷
-          isNoStart=!isNoStart;
-          nanduBXZ=false;
-          if(!isNoStart)
-          {
-            dianjiJDT=false;//µã»÷ÍÏ¶¯
-            isNoTCNDChoose=false;
+      if(dianjiKaiShi) {
+        if (e.getX() > startX + startBuffer * xSpan &&
+          e.getX() < startX + (nanduBuffer - spaceBufferX) * xSpan &&
+          e.getY() > buttonY &&
+          e.getY() < buttonY + spaceBufferY * xSpan) {
+          Toast.makeText(father, "start button clicked.", Toast.LENGTH_SHORT).show();
+          isNoStart = !isNoStart;
+          nanduBXZ = false;
+          if (!isNoStart) {
+            dianjiJDT = false;//µã»÷ÍÏ¶¯
+            isNoTCNDChoose = false;
           }
-          dianjiKaiShi=false;
+          dianjiKaiShi = false;
           onDrawcanvas();//ÖØ»æ·½·¨
-
         }
-        dianjiKaiShi=false;
+        dianjiKaiShi = false;
         onDrawcanvas();//ÖØ»æ·½·¨
         return true;
       }
 
-
-      if(dianjiNanDu)//ÄÑ¶ÈÇøÓò
-      {
-        if(e.getX()>startX+5.8f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-          e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+5.8f*xSpan+2*xSpan)//ÄÑ¶ÈÇøÓò
-        {
-          if(!isNoStart)//Èç¹ûÎªÔÝÍ£×´Ì¬ÏÂ£¬²Å¿ÉÓÃ
-          {
-            nanduBXZ=!nanduBXZ;
-            isNoTCNDChoose=!isNoTCNDChoose;
+      if(dianjiNanDu) {
+        if (e.getX() > startX + nanduBuffer * xSpan &&
+          e.getX() < startX + (huiqiBuffer - spaceBufferX) * xSpan &&
+          e.getY() > buttonY &&
+          e.getY() < buttonY + spaceBufferY * xSpan) {
+          Toast.makeText(father, "nandu button clicked", Toast.LENGTH_SHORT).show();
+          if (!isNoStart) {
+            nanduBXZ = !nanduBXZ;
+            isNoTCNDChoose = !isNoTCNDChoose;
+          } else {
+            isNoTCNDChoose = false;
+            dianjiJDT = false;
           }
-          else{
-            isNoTCNDChoose=false;
-            dianjiJDT=false;
-          }
-
-          isnoNanDu=!isnoNanDu;
+          isnoNanDu = !isnoNanDu;
         }
-
-        dianjiNanDu=false;
+        dianjiNanDu = false;
         onDrawcanvas();//ÖØ»æ·½·¨
         return true;
       }
 
-      if(dianjishengyin)
-      {
-        if(e.getX()>startX+8.3f*xSpan&&e.getY()>startY+13.5f*ySpan&&
-          e.getY()<startY+13.5f*ySpan+1*ySpan&&e.getX()<startX+8.3f*xSpan+2*xSpan)//ÉùÒôÇøÓò
-        {
-          isNoPlaySound=!isNoPlaySound;
+      if(dianjishengyin) {
+        if(e.getX() > startX + soundBuffer * xSpan &&
+          e.getX() < startX + (soundBuffer + roundBuffer - spaceBufferX) * xSpan &&
+          e.getY() > buttonY &&
+          e.getY() < buttonY + spaceBufferY * xSpan) {
+          Toast.makeText(father, "sound button clicked.", Toast.LENGTH_SHORT).show();
+          isNoPlaySound = !isNoPlaySound;
         }
-
-        dianjishengyin=false;
+        dianjishengyin = false;
         onDrawcanvas();//ÖØ»æ·½·¨
         return true;
       }
