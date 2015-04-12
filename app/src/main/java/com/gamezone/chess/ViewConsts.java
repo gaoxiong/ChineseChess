@@ -25,7 +25,7 @@ public class ViewConsts {
   public static boolean isNoStart = false;
   public static boolean isNoTCNDChoose;
   public static int hardCount = 1;
-  public static int thinkDeeplyTime = 1;
+  public static float thinkDeeplyTime = 0.3f;
   public static int zTime = 900000;
   public static int endTime = zTime;
   public static float xSpan = 48.0f * xZoom;
