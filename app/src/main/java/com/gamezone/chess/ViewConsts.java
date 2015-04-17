@@ -7,7 +7,7 @@ import android.graphics.Matrix;
  * Created by gaoxiong on 15-4-8.
  */
 public class ViewConsts {
-  public static float yBuffer = 50f;
+  public static float yBuffer = 100f;
   public static float startX = 0;
   public static float startY = 0;
 
@@ -19,6 +19,8 @@ public class ViewConsts {
 
   public static boolean yingJMFlag;
   public static boolean shuJMFlag;
+  public static boolean settingsPopupFlag;
+  public static boolean hardChooseFlag;
   public static int huiqiBS = 2;
   public static boolean isComputerPlayChess = false;
   public static boolean isHeqi = false;

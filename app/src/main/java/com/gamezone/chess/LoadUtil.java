@@ -1,17 +1,52 @@
 package com.gamezone.chess;
 
-import static com.gamezone.chess.Consts.*;
-import static com.gamezone.chess.ChessLoadUtil.*;
-
 import java.util.Arrays;
 
+import static com.gamezone.chess.ChessLoadUtil.ADVISOR_SPAN;
+import static com.gamezone.chess.ChessLoadUtil.AWAY_HALF;
+import static com.gamezone.chess.ChessLoadUtil.BISHOP_PIN;
+import static com.gamezone.chess.ChessLoadUtil.BISHOP_SPAN;
+import static com.gamezone.chess.ChessLoadUtil.DST;
+import static com.gamezone.chess.ChessLoadUtil.HOME_HALF;
+import static com.gamezone.chess.ChessLoadUtil.IN_BOARD;
+import static com.gamezone.chess.ChessLoadUtil.IN_FORT;
+import static com.gamezone.chess.ChessLoadUtil.KING_SPAN;
+import static com.gamezone.chess.ChessLoadUtil.KNIGHT_PIN;
+import static com.gamezone.chess.ChessLoadUtil.MOVE;
+import static com.gamezone.chess.ChessLoadUtil.OPP_SIDE_TAG;
+import static com.gamezone.chess.ChessLoadUtil.SAME_FILE;
+import static com.gamezone.chess.ChessLoadUtil.SAME_HALF;
+import static com.gamezone.chess.ChessLoadUtil.SAME_RANK;
+import static com.gamezone.chess.ChessLoadUtil.SIDE_TAG;
+import static com.gamezone.chess.ChessLoadUtil.SQUARE_FLIP;
+import static com.gamezone.chess.ChessLoadUtil.SQUARE_FORWARD;
+import static com.gamezone.chess.ChessLoadUtil.SRC;
+import static com.gamezone.chess.Consts.ADVANCED_VALUE;
+import static com.gamezone.chess.Consts.LIMIT_DEPTH;
+import static com.gamezone.chess.Consts.MATE_VALUE;
+import static com.gamezone.chess.Consts.MAX_GEN_MOVES;
+import static com.gamezone.chess.Consts.PIECE_ADVISOR;
+import static com.gamezone.chess.Consts.PIECE_BISHOP;
+import static com.gamezone.chess.Consts.PIECE_CANNON;
+import static com.gamezone.chess.Consts.PIECE_KING;
+import static com.gamezone.chess.Consts.PIECE_KNIGHT;
+import static com.gamezone.chess.Consts.PIECE_PAWN;
+import static com.gamezone.chess.Consts.PIECE_ROOK;
+import static com.gamezone.chess.Consts.WIN_VALUE;
+import static com.gamezone.chess.Consts.ccAdvisorDelta;
+import static com.gamezone.chess.Consts.ccKingDelta;
+import static com.gamezone.chess.Consts.ccKnightCheckDelta;
+import static com.gamezone.chess.Consts.ccKnightDelta;
+import static com.gamezone.chess.Consts.cucpcStartup;
+import static com.gamezone.chess.Consts.cucvlPiecePos;
+
 public class LoadUtil {
-  public static int sdPlayer=1;                   // ÂÖµ½Ë­×ß£¬0=ºì·½£¬1=ºÚ·½
-  public static int ucpcSquares[]=new int[256];          // ÆåÅÌÉÏµÄÆå×Ó
-  public static int vlWhite, vlBlack;           // ºì¡¢ºÚË«·½µÄ×ÓÁ¦¼ÛÖµ
-  public static int nDistance;                  // ¾àÀë¸ù½ÚµãµÄ²½Êý
-  public static int mvResult;             // µçÄÔ×ßµÄÆå
-  public static int nHistoryTable[]=new int[65536]; // ÀúÊ·±í
+  public static int sdPlayer=1;
+  public static int ucpcSquares[]=new int[256];
+  public static int vlWhite, vlBlack;
+  public static int nDistance;
+  public static int mvResult;
+  public static int nHistoryTable[]=new int[65536];
 
   public static void initHistorytable()
   {
@@ -46,15 +81,15 @@ public class LoadUtil {
   }
   public static void UndoMakeMove(int mv, int pcCaptured) { // ³·Ïû×ßÒ»²½Æå
     nDistance --;
-    ChangeSide();//½»»»×ß×Ó
-    UndoMovePiece(mv, pcCaptured);//³·Ïú×ß×Ó
+    ChangeSide();
+    UndoMovePiece(mv, pcCaptured);
   }
 
   // ³õÊ¼»¯ÆåÅÌ
   public static void Startup() {
     int sq, pc;
     sdPlayer = vlWhite = vlBlack = nDistance = 0;
-    for(int i=0;i<256;i++)//³õÊ¼»¯ÎªÁã
+    for(int i=0;i<256;i++)
     {
       ucpcSquares[i]=0;
     }
@@ -72,14 +107,14 @@ public class LoadUtil {
     int sqSrc, sqDst, pc, pcCaptured;
     sqSrc = SRC(mv);
     sqDst = DST(mv);
-    pcCaptured = ucpcSquares[sqDst];//µÃµ½Ä¿µÄ¸ñ×ÓµÄÆå×Ó
-    if (pcCaptured != 0) {//Ä¿µÄµØ²»Îª¿Õ
-      DelPiece(sqDst, pcCaptured);//É¾µôÄ¿±ê¸ñ×ÓÆå×Ó
+    pcCaptured = ucpcSquares[sqDst];
+    if (pcCaptured != 0) {
+      DelPiece(sqDst, pcCaptured);
     }
-    pc = ucpcSquares[sqSrc];//µÃµ½³õÊ¼¸ñ×ÓÉÏµÄÆå×Ó
-    DelPiece(sqSrc, pc);//É¾µô³õÊ¼¸ñ×ÓÉÏµÄÆå×Ó
-    AddPiece(sqDst, pc);//ÔÚÄ¿±ê¸ñ×ÓÉÏ·ÅÉÏÆå×Ó
-    return pcCaptured;//·µ»ØÔ­À´Ä¿±ê¸ñ×ÓÉÏµÄÆå×Ó
+    pc = ucpcSquares[sqSrc];
+    DelPiece(sqSrc, pc);
+    AddPiece(sqDst, pc);
+    return pcCaptured;
   }
 
   // ³·Ïû°áÒ»²½ÆåµÄÆå×Ó
@@ -132,7 +167,7 @@ public class LoadUtil {
             }
             pcDst = ucpcSquares[sqDst];
             if ((pcDst & pcSelfSide) == 0) {
-              mvs[nGenMoves] = MOVE(sqSrc, sqDst);// ¸ù¾ÝÆðµãºÍÖÕµã»ñµÃ×ß·¨
+              mvs[nGenMoves] = MOVE(sqSrc, sqDst);
               nGenMoves ++;
             }
           }
@@ -232,7 +267,7 @@ public class LoadUtil {
           }
           break;
         case PIECE_PAWN:
-          sqDst = SQUARE_FORWARD(sqSrc, sdPlayer);// ¸ñ×ÓË®Æ½¾µÏñ
+          sqDst = SQUARE_FORWARD(sqSrc, sdPlayer);
           if (IN_BOARD(sqDst)) {// ÅÐ¶ÏÆå×ÓÊÇ·ñÔÚÆåÅÌÖÐ
             pcDst = ucpcSquares[sqDst];
             if ((pcDst & pcSelfSide) == 0) {
@@ -267,7 +302,7 @@ public class LoadUtil {
     // 1. ÅÐ¶ÏÆðÊ¼¸ñÊÇ·ñÓÐ×Ô¼ºµÄÆå×Ó
     sqSrc = SRC(mv);
     pcSrc = ucpcSquares[sqSrc];
-    pcSelfSide = SIDE_TAG(sdPlayer);  // »ñµÃºìºÚ±ê¼Ç(ºì×ÓÊÇ8£¬ºÚ×ÓÊÇ16)
+    pcSelfSide = SIDE_TAG(sdPlayer);
     if ((pcSrc & pcSelfSide) == 0) {
       return false;
     }
@@ -329,8 +364,8 @@ public class LoadUtil {
   public static boolean Checked()  {
     int i, j, sqSrc, sqDst;
     int pcSelfSide, pcOppSide, pcDst, nDelta;
-    pcSelfSide = SIDE_TAG(sdPlayer);// »ñµÃºìºÚ±ê¼Ç(ºì×ÓÊÇ8£¬ºÚ×ÓÊÇ16)
-    pcOppSide = OPP_SIDE_TAG(sdPlayer);// »ñµÃºìºÚ±ê¼Ç£¬¶Ô·½µÄ
+    pcSelfSide = SIDE_TAG(sdPlayer);
+    pcOppSide = OPP_SIDE_TAG(sdPlayer);
     // ÕÒµ½ÆåÅÌÉÏµÄË§(½«)£¬ÔÙ×öÒÔÏÂÅÐ¶Ï£º
 
     for (sqSrc = 0; sqSrc < 256; sqSrc ++) {
@@ -424,8 +459,8 @@ public class LoadUtil {
     }
 
     // 2. ³õÊ¼»¯×î¼ÑÖµºÍ×î¼Ñ×ß·¨
-    vlBest = -MATE_VALUE; // ÕâÑù¿ÉÒÔÖªµÀ£¬ÊÇ·ñÒ»¸ö×ß·¨¶¼Ã»×ß¹ý(É±Æå)
-    mvBest = 0;           // ÕâÑù¿ÉÒÔÖªµÀ£¬ÊÇ·ñËÑË÷µ½ÁËBeta×ß·¨»òPV×ß·¨£¬ÒÔ±ã±£´æµ½ÀúÊ·±í
+    vlBest = -MATE_VALUE;
+    mvBest = 0;
 
     // 3. Éú³ÉÈ«²¿×ß·¨£¬²¢¸ù¾ÝÀúÊ·±íÅÅÐò
     nGenMoves = GenerateMoves(mvs);
@@ -440,14 +475,14 @@ public class LoadUtil {
 
         // 5. ½øÐÐAlpha-Beta´óÐ¡ÅÐ¶ÏºÍ½Ø¶Ï
         if (vl > vlBest) {    // ÕÒµ½×î¼ÑÖµ(µ«²»ÄÜÈ·¶¨ÊÇAlpha¡¢PV»¹ÊÇBeta×ß·¨)
-          vlBest = vl;        // "vlBest"¾ÍÊÇÄ¿Ç°Òª·µ»ØµÄ×î¼ÑÖµ£¬¿ÉÄÜ³¬³öAlpha-Beta±ß½ç
+          vlBest = vl;
           if (vl >= vlBeta) { // ÕÒµ½Ò»¸öBeta×ß·¨
-            mvBest = mvs[i];  // Beta×ß·¨Òª±£´æµ½ÀúÊ·±í
-            break;            // Beta½Ø¶Ï
+            mvBest = mvs[i];
+            break;
           }
           if (vl > vlAlpha) { // ÕÒµ½Ò»¸öPV×ß·¨
-            mvBest = mvs[i];  // PV×ß·¨Òª±£´æµ½ÀúÊ·±í
-            vlAlpha = vl;     // ËõÐ¡Alpha-Beta±ß½ç
+            mvBest = mvs[i];
+            vlAlpha = vl;
           }
         }
       }
@@ -475,7 +510,7 @@ public class LoadUtil {
 
     // ³õÊ¼»¯
     initHistorytable();
-    nDistance = 0; // ³õÊ¼²½Êý
+    nDistance = 0;
     long start=System.nanoTime();
     // µü´ú¼ÓÉî¹ý³Ì
     for (i = 1; i <= LIMIT_DEPTH; i ++) {
