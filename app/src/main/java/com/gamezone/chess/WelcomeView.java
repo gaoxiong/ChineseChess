@@ -38,6 +38,10 @@ public class WelcomeView extends SurfaceView implements SurfaceHolder.Callback {
   }
 
   public void onDraw(Canvas canvas) {
+    drawCanvas(canvas);
+  }
+
+  private void drawCanvas(Canvas canvas) {
     paint.setColor(Color.BLACK);
     paint.setAlpha(255);
     canvas.drawRect(0, 0, width, height, paint);
@@ -77,7 +81,7 @@ public class WelcomeView extends SurfaceView implements SurfaceHolder.Callback {
             Canvas canvas = myHolder.lockCanvas();
             try {
               synchronized (myHolder) {
-                onDraw(canvas);
+                drawCanvas(canvas);
               }
             } catch (Exception e) {
               e.printStackTrace();
