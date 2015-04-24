@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -154,20 +155,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   private void drawCanvas(Canvas canvas) {
     canvas.drawColor(Color.argb(255, 0, 0, 0));
-    canvas.drawBitmap(bgImage, startX, 0, null);
+    Rect rectSrc = new Rect(0, 0, bgImage.getWidth(), bgImage.getHeight());
+    RectF rectF = new RectF(startX, 0,
+      father.getWindowManager().getDefaultDisplay().getWidth(),
+      father.getWindowManager().getDefaultDisplay().getHeight());
+    canvas.drawBitmap(bgImage, rectSrc, rectF, null);
 
     if (isNoStart) {
       onDrawWindowindow(canvas, ViewConsts.startX, ViewConsts.startY);
       if (flag) {
-        float left=xMove>startX+5*xSpan?windowXstartLeft:windowXstartRight;
-        float top=windowYstart;
-        float right=left+windowWidth;
-        float bottom=top+windowHeight;
-        canvas.save();
-        canvas.clipRect(new RectF(left,top,right,bottom));
-        onDrawWindowindow(canvas, xStartCK, yStartCK);
-        canvas.restore();
-        canvas.drawBitmap(bgZoomOutline,left-6,top-6, null);
+//        float left=xMove>startX+5*xSpan?windowXstartLeft:windowXstartRight;
+//        float top=windowYstart;
+//        float right=left+windowWidth;
+//        float bottom=top+windowHeight;
+//        canvas.save();
+//        canvas.clipRect(new RectF(left,top,right,bottom));
+//        onDrawWindowindow(canvas, xStartCK, yStartCK);
+//        canvas.restore();
+//        canvas.drawBitmap(bgZoomOutline,left-6,top-6, null);
       }
     } else {
       canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))],startX, startY, null);
