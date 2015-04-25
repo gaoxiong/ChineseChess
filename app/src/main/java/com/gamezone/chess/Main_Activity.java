@@ -12,9 +12,18 @@ import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
+
 import java.util.HashMap;
 
-import static com.gamezone.chess.ViewConsts.*;
+import static com.gamezone.chess.ViewConsts.height;
+import static com.gamezone.chess.ViewConsts.initChessViewFinal;
+import static com.gamezone.chess.ViewConsts.isNoPlaySound;
+import static com.gamezone.chess.ViewConsts.startX;
+import static com.gamezone.chess.ViewConsts.startY;
+import static com.gamezone.chess.ViewConsts.width;
+import static com.gamezone.chess.ViewConsts.xZoom;
+import static com.gamezone.chess.ViewConsts.yBuffer;
+import static com.gamezone.chess.ViewConsts.yZoom;
 
 enum WhichView {
   WELCOME_VIEW,

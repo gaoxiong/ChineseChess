@@ -188,17 +188,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       canvas.drawBitmap(fugaiTu,startX,startY, null);
       canvas.drawBitmap(winJiemian,startX+2.5f*xSpan,startY+5f*ySpan, null);
       if (dianjiQueDing) {
-        canvas.drawBitmap(scaleToFit(queDinButton,1.2f),startX+3.7f*xSpan,startY+8.3f*ySpan, null);
+        canvas.drawBitmap(scaleToFit(queDinButton,0.8f),startX + 3.7f*xSpan,startY + 9.3f*ySpan, null);
       } else {
-        canvas.drawBitmap(queDinButton, startX + 3.9f * xSpan, startY + 8.5f * ySpan, null);
+        canvas.drawBitmap(scaleToFit(queDinButton,0.6f), startX + 3.9f * xSpan, startY + 9.5f * ySpan, null);
       }
     } else if (loseFlag) {
       canvas.drawBitmap(fugaiTu,startX,startY, null);
       canvas.drawBitmap(loseJiemian,startX+2.5f*xSpan,startY+5f*ySpan, null);
       if (dianjiQueDing){
-        canvas.drawBitmap(scaleToFit(queDinButton,1.2f),startX+3.7f*xSpan,startY+8.3f*ySpan, null);
+        canvas.drawBitmap(scaleToFit(queDinButton,0.8f),startX+3.7f*xSpan,startY+9.3f*ySpan, null);
       } else {
-        canvas.drawBitmap(queDinButton, startX + 3.9f * xSpan, startY + 8.5f * ySpan, null);
+        canvas.drawBitmap(scaleToFit(queDinButton,0.6f), startX + 3.9f * xSpan, startY + 9.5f * ySpan, null);
       }
     } else if (settingsFlag) {
       drawSettings();
