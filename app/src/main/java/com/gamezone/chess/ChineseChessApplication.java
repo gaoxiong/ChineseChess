@@ -2,6 +2,13 @@ package com.gamezone.chess;
 
 import android.app.Application;
 
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
+import java.util.HashMap;
+
 /**
  * Created by gaoxiong on 2015/4/24.
  */
@@ -21,6 +28,9 @@ public class ChineseChessApplication extends Application {
 
   public final static int PROPERTY_ID = 62253418;
 
+  HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
+  private AdView adView;
+
   @Override
   public void onCreate() {
     super.onCreate();
@@ -28,5 +38,19 @@ public class ChineseChessApplication extends Application {
   }
 
   private void init() {
+    Tracker t = getTracker(TrackerName.GLOBAL_TRACKER);
+    t.setAppName(getApplicationInfo().packageName);
+    t.send(new HitBuilders.AppViewBuilder().build());
+  }
+
+  synchronized Tracker getTracker(TrackerName trackerId) {
+    if (!mTrackers.containsKey(trackerId)) {
+      GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+      Tracker t = (trackerId == TrackerName.APP_TRACKER) ? analytics.newTracker(PROPERTY_ID)
+        : (trackerId == TrackerName.GLOBAL_TRACKER) ? analytics.newTracker(R.xml.global_tracker)
+        : analytics.newTracker(R.xml.global_tracker);
+      mTrackers.put(trackerId, t);
+    }
+    return mTrackers.get(trackerId);
   }
 }
