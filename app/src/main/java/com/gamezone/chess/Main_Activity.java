@@ -1,6 +1,8 @@
 package com.gamezone.chess;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
@@ -31,7 +33,7 @@ enum WhichView {
 };
 
 public class Main_Activity extends Activity {
-  GameView gameView;
+  GameMainViewFragment gameView;
   WhichView whichView;
   WelcomeView welcomeView;
   SoundPool soundPool;
@@ -94,8 +96,11 @@ public class Main_Activity extends Activity {
   }
 
   private void gotoGameView() {
-    gameView = new GameView(Main_Activity.this);
-    setContentView(gameView);
+    gameView = new GameMainViewFragment();
+    FragmentManager fm = getFragmentManager();
+    FragmentTransaction ft = fm.beginTransaction();
+    ft.replace(android.R.id.content, gameView);
+    ft.commit();
     whichView = WhichView.GAME_VIEW;
   }
 
@@ -116,7 +121,7 @@ public class Main_Activity extends Activity {
       return true;
     }
     if (whichView == WhichView.GAME_VIEW) {
-      gameView.threadFlag = false;
+      gameView.setThreadFlag(false);
       System.exit(0);
       return true;
     }

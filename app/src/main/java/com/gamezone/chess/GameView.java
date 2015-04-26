@@ -126,12 +126,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   public GameView(Context context) {
     super(context);
+    setWillNotDraw(false);
     this.father=(Main_Activity)context;
     this.getHolder().addCallback(this);
     paint = new Paint();
     paint.setAntiAlias(true);
     isNoStart=false;
-    length=hardCount*4;
+    length = hardCount*4;
     initColor();
     LoadUtil.Startup();
     initArrays();
@@ -139,12 +140,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     LoadUtil.sdPlayer=0;
     endTime=zTime;
   }
+
+
   public void initArrays()
   {
     for(int i=0;i<256;i++)
     {
       ucpcSquares[i]=LoadUtil.ucpcSquares[i];
     }
+  }
+
+  public void setThreadFlag(boolean flag) {
+    threadFlag = flag;
   }
   
   @Override
@@ -178,7 +185,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))],startX, startY, null);
     }
 
-    onDrawWindowMenu(canvas,ViewConsts.startX,ViewConsts.startY);
+    onDrawWindowMenu(canvas, ViewConsts.startX, ViewConsts.startY);
     drawPopupWindows(yingJMFlag, shuJMFlag, settingsPopupFlag, hardChooseFlag);
   }
 
@@ -344,8 +351,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  private void drawLeftRoundIcon() {
-    buttonY = startY + 11.6f * ySpan;
+  private void drawLeftRoundIcon(Canvas canvas) {
     if (playChessflag) {
       canvas.drawBitmap(scaleToFit(chessBitmap[1][0], 0.9f),
         startX + chessBuffer * xSpan,
@@ -357,7 +363,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  private void drawNewGameButton() {
+  private void drawNewGameButton(Canvas canvas) {
     if (newGameFlag) {
       canvas.drawBitmap(scaleToFit(newGameBitmap, scale),
         startX + newGameBuffer * xSpan,
@@ -369,7 +375,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  private void drawSettingsButton() {
+  private void drawSettingsButton(Canvas canvas) {
     if (isSettingBtnClicked) {
       canvas.drawBitmap(scaleToFit(settingsBitmap, scale),
         startX + settingsBuffer * xSpan,
@@ -383,13 +389,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  private void drawHardChooseButton() {
+  private void drawHardChooseButton(Canvas canvas) {
     canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
       startX + nanduBuffer * xSpan,
       buttonY, null);
   }
 
-  private void drawRegretButton() {
+  private void drawRegretButton(Canvas canvas) {
     if (huiqiFlag) {
       canvas.drawBitmap(scaleToFit(huiqi, scale),
         startX + huiqiBuffer * xSpan,
@@ -403,7 +409,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  private void drawSoundButton() {
+  private void drawSoundButton(Canvas canvas) {
     if (isNoPlaySound) {
       if (dianjishengyin) {
         canvas.drawBitmap(scaleToFit(isPlaySound, scale),
@@ -429,74 +435,27 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   public void onDrawWindowMenu(Canvas canvas,float startX,float startY) {
     canvas.drawBitmap(scaleToFit(menuBg, 1f), startX, startY + 11.0f * ySpan, null);
-    //canvas.drawBitmap(iconLeftBottom, startX + 0.5f * xSpan, startY + 11.4f * ySpan, null);
-    drawLeftRoundIcon();
 
-    //»æÖÆÊ±¼ä
-//    drawScoreStr(canvas,endTime/1000/60<10?"0"+endTime/1000/60:endTime/1000/60+"",
-//      startX+3f*xSpan,startY+11.4f*ySpan);
-//    canvas.drawBitmap(dunhao,startX+scoreWidth*2+3f*xSpan,startY+11.4f*ySpan, null);
-//    drawScoreStr(canvas,endTime/1000%60<10?"0"+endTime/1000%60:endTime/1000%60+"",
-//      scoreWidth*3+startX+3f*xSpan,startY+11.4f*ySpan);
+    buttonY = startY + 11.6f * ySpan;
+    drawLeftRoundIcon(canvas);
 
-    //canvas.drawBitmap(scaleToFit(menuBg,1f),startX,startY+12.8f*ySpan, null);
     newGameBuffer = chessBuffer + roundBuffer;
     addinBufferX = 1.8f;
     spaceBufferY = 0.68f;
     spaceBufferX = addinBufferX - 1.5f;
-    drawNewGameButton();
+    drawNewGameButton(canvas);
 
     settingsBuffer = newGameBuffer + addinBufferX;
-    drawSettingsButton();
-//    if (isNoStart) {
-//      if (isSettingBtnClicked) {
-//        canvas.drawBitmap(scaleToFit(suspend, scale),
-//          startX + settingsBuffer * xSpan,
-//          buttonY,
-//          null);
-//      } else {
-//        canvas.drawBitmap(scaleToFit(suspend, scale),
-//          startX + settingsBuffer * xSpan,
-//          buttonY,
-//          null);
-//      }
-//    } else {
-//      if (isSettingBtnClicked) {
-//        canvas.drawBitmap(scaleToFit(startBitmap, scale),
-//          startX + settingsBuffer * xSpan,
-//          buttonY,
-//          null);
-//      } else {
-//        canvas.drawBitmap(scaleToFit(startBitmap, scale),
-//          startX + settingsBuffer * xSpan,
-//          buttonY,
-//          null);
-//      }
-//    }
+    drawSettingsButton(canvas);
 
     nanduBuffer = settingsBuffer + addinBufferX;
-    drawHardChooseButton();
-//    if (!isNoStart) {
-//      if (dianjiNanDu) {
-//        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
-//          startX + nanduBuffer * xSpan,
-//          buttonY, null);
-//      } else {
-//        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
-//          startX + nanduBuffer * xSpan,
-//          buttonY, null);
-//      }
-//    } else {
-//      canvas.drawBitmap(scaleToFit(nonandutiaoZ, scale),
-//        startX + nanduBuffer * xSpan,
-//        buttonY, null);
-//    }
+    drawHardChooseButton(canvas);
 
     huiqiBuffer = nanduBuffer + addinBufferX;
-    drawRegretButton();
+    drawRegretButton(canvas);
 
     soundBuffer = huiqiBuffer + addinBufferX;
-    drawSoundButton();
+    drawSoundButton(canvas);
   }
 
   public void initColor()
@@ -665,9 +624,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       }
     }.start();
   }
+
   @Override
   public void surfaceDestroyed(SurfaceHolder holder) {}
-
 
   private boolean isOverPlayAgainBtn(MotionEvent e) {
     if (e.getX() > startX + newGameBuffer * xSpan &&
