@@ -4,4 +4,9 @@
     <string name="app_name">中国象棋</string>
     <string name="cannot_reget_anymore">哥们，不能再悔了!</string>
     <string name="repeat_move_chess">哥们，换个走法呗!</string>
+
+    <string name="startpage_ad_unit_id">ca-app-pub-7838907906037025/1814221392</string>
+    <string name="top_banner_ad_unit_id">ca-app-pub-7838907906037025/8000355798</string>
+    <string name="bottom_banner_ad_unit_id">ca-app-pub-7838907906037025/3290954596</string>
+    <string name="pausepage_ad_unit_id">ca-app-pub-7838907906037025/6244420995</string>
 </resources>

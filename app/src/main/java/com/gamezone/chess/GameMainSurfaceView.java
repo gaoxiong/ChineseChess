@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -48,8 +49,8 @@ import static com.gamezone.chess.ViewConsts.yStartCK;
 import static com.gamezone.chess.ViewConsts.yingJMFlag;
 import static com.gamezone.chess.ViewConsts.zTime;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback{
-  Main_Activity father;
+public class GameMainSurfaceView extends SurfaceView implements SurfaceHolder.Callback{
+  Context context;
   Bitmap[][] chessBitmap;
   Bitmap chessChosenFlag;
   Bitmap paotai;
@@ -124,15 +125,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   float huiqiBuffer;
   float soundBuffer;
 
-  public GameView(Context context) {
-    super(context);
-    setWillNotDraw(false);
-    this.father=(Main_Activity)context;
+  private int screenWidth, screenHeight;
+
+  public GameMainSurfaceView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    this.context=context;
     this.getHolder().addCallback(this);
     paint = new Paint();
     paint.setAntiAlias(true);
+    paint.setColor(Color.WHITE);
+    setFocusable(true);
     isNoStart=false;
-    length = hardCount*4;
+    length=hardCount*4;
     initColor();
     LoadUtil.Startup();
     initArrays();
@@ -141,6 +145,91 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     endTime=zTime;
   }
 
+  @Override
+  public void onDraw(Canvas canvas) {
+    drawCanvas(canvas);
+  }
+
+  @Override
+  public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                             int height) {
+  }
+
+  @Override
+  public void surfaceCreated(SurfaceHolder holder) {
+    screenHeight = this.getHeight();
+    screenWidth = this.getWidth();
+    int surfaceViewWidth = ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getWidth();
+    int surfaceViewHeight = ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getHeight();
+    //holder.setFixedSize(surfaceViewWidth, surfaceViewHeight);
+    this.holder=holder;
+    canvas = null;
+    try {
+      canvas = holder.lockCanvas(null);
+      synchronized (holder) {
+        drawCanvas(canvas);
+      }
+    } finally {
+      if (canvas != null) {
+        holder.unlockCanvasAndPost(canvas);
+      }
+    }
+    // time calc
+    //newThread();
+  }
+
+  public void newThread()
+  {
+    new Thread(){
+      @Override
+      public void run()
+      {
+        while(threadFlag)
+        {
+          if (isNoStart)
+          {
+            if (endTime - 500<0)
+            {
+              if (!isPlayerPlaying)
+              {
+                yingJMFlag = true;
+                LoadUtil.Startup();
+                initArrays();
+                endTime=zTime;
+                isNoStart=false;
+                dianjiJDT=false;
+              } else {
+                shuJMFlag=true;
+                LoadUtil.Startup();
+                initArrays();
+                endTime=zTime;
+                isNoStart=false;
+                dianjiJDT=false;
+              }
+            } else {
+              endTime-=500;
+            }
+          }
+          guanggao2X-=10;
+          if (guanggao2X<-400*xZoom)
+          {
+            guanggao2X=400*xZoom;
+          }
+
+          onDrawCanvas();
+          try {
+            Thread.sleep(500);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+
+        }
+      }
+    }.start();
+  }
+
+  @Override
+  public void surfaceDestroyed(SurfaceHolder holder) {}
 
   public void initArrays()
   {
@@ -150,23 +239,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     }
   }
 
-  public void setThreadFlag(boolean flag) {
-    threadFlag = flag;
-  }
-  
-  @Override
-  public void onDraw(Canvas canvas)
-  {
-    drawCanvas(canvas);
-  }
-
   private void drawCanvas(Canvas canvas) {
     canvas.drawColor(Color.argb(255, 0, 0, 0));
     Rect rectSrc = new Rect(0, 0, bgImage.getWidth(), bgImage.getHeight());
     RectF rectF = new RectF(startX, 0,
-      father.getWindowManager().getDefaultDisplay().getWidth(),
-      father.getWindowManager().getDefaultDisplay().getHeight());
-    canvas.drawBitmap(bgImage, rectSrc, rectF, null);
+      ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getWidth(),
+      ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getHeight());
+    //canvas.drawBitmap(bgImage, rectSrc, rectF, null);
 
     if (isNoStart) {
       onDrawWindowindow(canvas, ViewConsts.startX, ViewConsts.startY);
@@ -182,14 +261,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 //        canvas.drawBitmap(bgZoomOutline,left-6,top-6, null);
       }
     } else {
-      canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))],startX, startY, null);
+      canvas.drawBitmap(guanggao1[(int) ((Math.abs(guanggao2X/40)%2))], startX, startY, null);
     }
 
-    onDrawWindowMenu(canvas, ViewConsts.startX, ViewConsts.startY);
-    drawPopupWindows(yingJMFlag, shuJMFlag, settingsPopupFlag, hardChooseFlag);
+    onDrawWindowMenu(canvas,ViewConsts.startX,ViewConsts.startY);
+    drawPopupWindows(canvas, yingJMFlag, shuJMFlag, settingsPopupFlag, hardChooseFlag);
   }
 
-  private void drawPopupWindows(boolean winFlag, boolean loseFlag, boolean settingsFlag, boolean hardChooseFlag) {
+  private void drawPopupWindows(Canvas canvas, boolean winFlag, boolean loseFlag, boolean settingsFlag, boolean hardChooseFlag) {
     if (winFlag)
     {
       canvas.drawBitmap(fugaiTu,startX,startY, null);
@@ -352,6 +431,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   }
 
   private void drawLeftRoundIcon(Canvas canvas) {
+    buttonY = startY + 11.6f * ySpan;
     if (playChessflag) {
       canvas.drawBitmap(scaleToFit(chessBitmap[1][0], 0.9f),
         startX + chessBuffer * xSpan,
@@ -435,10 +515,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
   public void onDrawWindowMenu(Canvas canvas,float startX,float startY) {
     canvas.drawBitmap(scaleToFit(menuBg, 1f), startX, startY + 11.0f * ySpan, null);
-
-    buttonY = startY + 11.6f * ySpan;
+    //canvas.drawBitmap(iconLeftBottom, startX + 0.5f * xSpan, startY + 11.4f * ySpan, null);
     drawLeftRoundIcon(canvas);
 
+    //»æÖÆÊ±¼ä
+//    drawScoreStr(canvas,endTime/1000/60<10?"0"+endTime/1000/60:endTime/1000/60+"",
+//      startX+3f*xSpan,startY+11.4f*ySpan);
+//    canvas.drawBitmap(dunhao,startX+scoreWidth*2+3f*xSpan,startY+11.4f*ySpan, null);
+//    drawScoreStr(canvas,endTime/1000%60<10?"0"+endTime/1000%60:endTime/1000%60+"",
+//      scoreWidth*3+startX+3f*xSpan,startY+11.4f*ySpan);
+
+    //canvas.drawBitmap(scaleToFit(menuBg,1f),startX,startY+12.8f*ySpan, null);
     newGameBuffer = chessBuffer + roundBuffer;
     addinBufferX = 1.8f;
     spaceBufferY = 0.68f;
@@ -447,9 +534,49 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
 
     settingsBuffer = newGameBuffer + addinBufferX;
     drawSettingsButton(canvas);
+//    if (isNoStart) {
+//      if (isSettingBtnClicked) {
+//        canvas.drawBitmap(scaleToFit(suspend, scale),
+//          startX + settingsBuffer * xSpan,
+//          buttonY,
+//          null);
+//      } else {
+//        canvas.drawBitmap(scaleToFit(suspend, scale),
+//          startX + settingsBuffer * xSpan,
+//          buttonY,
+//          null);
+//      }
+//    } else {
+//      if (isSettingBtnClicked) {
+//        canvas.drawBitmap(scaleToFit(startBitmap, scale),
+//          startX + settingsBuffer * xSpan,
+//          buttonY,
+//          null);
+//      } else {
+//        canvas.drawBitmap(scaleToFit(startBitmap, scale),
+//          startX + settingsBuffer * xSpan,
+//          buttonY,
+//          null);
+//      }
+//    }
 
     nanduBuffer = settingsBuffer + addinBufferX;
     drawHardChooseButton(canvas);
+//    if (!isNoStart) {
+//      if (dianjiNanDu) {
+//        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
+//          startX + nanduBuffer * xSpan,
+//          buttonY, null);
+//      } else {
+//        canvas.drawBitmap(scaleToFit(nandutiaoZ, scale),
+//          startX + nanduBuffer * xSpan,
+//          buttonY, null);
+//      }
+//    } else {
+//      canvas.drawBitmap(scaleToFit(nonandutiaoZ, scale),
+//        startX + nanduBuffer * xSpan,
+//        buttonY, null);
+//    }
 
     huiqiBuffer = nanduBuffer + addinBufferX;
     drawRegretButton(canvas);
@@ -553,80 +680,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     };
   }
 
-  @Override
-  public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                             int height) {}
-  @Override
-  public void surfaceCreated(SurfaceHolder holder) {
-
-    this.holder=holder;
-    canvas = null;
-    try {
-        canvas = holder.lockCanvas(null);
-        synchronized (holder) {
-          drawCanvas(canvas);
-        }
-    } finally {
-      if (canvas != null) {
-        holder.unlockCanvasAndPost(canvas);
-      }
-    }
-    // time calc
-    //newThread();
-  }
-
-  public void newThread()
-  {
-    new Thread(){
-      @Override
-      public void run()
-      {
-        while(threadFlag)
-        {
-          if (isNoStart)
-          {
-            if (endTime - 500<0)
-            {
-              if (!isPlayerPlaying)
-              {
-                yingJMFlag = true;
-                LoadUtil.Startup();
-                initArrays();
-                endTime=zTime;
-                isNoStart=false;
-                dianjiJDT=false;
-              } else {
-                shuJMFlag=true;
-                LoadUtil.Startup();
-                initArrays();
-                endTime=zTime;
-                isNoStart=false;
-                dianjiJDT=false;
-              }
-            } else {
-              endTime-=500;
-            }
-          }
-          guanggao2X-=10;
-          if (guanggao2X<-400*xZoom)
-          {
-            guanggao2X=400*xZoom;
-          }
-
-          onDrawCanvas();
-          try {
-            Thread.sleep(500);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-
-        }
-      }
-    }.start();
-  }
-
-  @Override
-  public void surfaceDestroyed(SurfaceHolder holder) {}
 
   private boolean isOverPlayAgainBtn(MotionEvent e) {
     if (e.getX() > startX + newGameBuffer * xSpan &&
@@ -892,7 +945,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
         flag=false;
         onDrawCanvas();
         Toast.makeText(
-          father,
+          context,
           R.string.repeat_move_chess,
           Toast.LENGTH_SHORT).show();
         return true;
@@ -900,7 +953,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
       if (LegalMove(mv)) {
         if (MakeMove(mv, 0)) {
           initArrays();
-          father.playSound(2,1);
+          ((GameMainViewActivity)context).playSound(2, 1);
           huiqibushu=0;
           onDrawCanvas();
           stack.push(new StackPlayChess(xzgz+((bzrow+3)*16+bzcol+3)*256,pcCaptured));
@@ -908,7 +961,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
             LoadUtil.Startup();
             initArrays();
             yingJMFlag=true;
-            father.playSound(4,1);
+            ((GameMainViewActivity)context).playSound(4,1);
             onDrawCanvas();
           } else {
             new Thread(){
@@ -931,9 +984,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
                   LoadUtil.Startup();
                   initArrays();
                   shuJMFlag=true;
-                  father.playSound(5,1);
+                  ((GameMainViewActivity)context).playSound(5, 1);
                 }else
-                  father.playSound(2,1);
+                  ((GameMainViewActivity)context).playSound(2, 1);
                 isPlayerPlaying =true;
                 playChessflag=false;
                 endTime=zTime;
@@ -1022,7 +1075,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
   private boolean doRegret() {
     if (!stack.empty() && stack.size() > 1) {
       if (huiqibushu > huiqiBS) {
-        Toast.makeText(father, R.string.cannot_reget_anymore,
+        Toast.makeText(context, R.string.cannot_reget_anymore,
           Toast.LENGTH_SHORT).show();
         return true;
       }
@@ -1064,8 +1117,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback{
     return false;
   }
 
-  public void onDrawCanvas()
-  {
+  public void onDrawCanvas() {
     try {
       canvas = holder.lockCanvas(null);
       synchronized (holder) {

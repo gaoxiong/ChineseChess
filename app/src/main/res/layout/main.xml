@@ -1,12 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-</LinearLayout>
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adViewTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/top_banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adViewBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/bottom_banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
+    <com.gamezone.chess.GameMainSurfaceView
+        android:id="@+id/GameSurfaceView"
+                 android:layout_below="@id/adViewTop"
+                 android:layout_above="@id/adViewBottom"
+                 android:layout_margin="0dp"
+                 android:layout_width="fill_parent"
+                 android:layout_height="fill_parent" />
+</RelativeLayout>

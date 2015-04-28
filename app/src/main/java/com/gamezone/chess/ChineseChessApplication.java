@@ -53,8 +53,4 @@ public class ChineseChessApplication extends Application {
     }
     return mTrackers.get(trackerId);
   }
-
-  public ChineseChessApplication getApplication() {
-    return this;
-  }
 }
