@@ -7,7 +7,7 @@ import android.graphics.Matrix;
  * Created by gaoxiong on 15-4-8.
  */
 public class ViewConsts {
-  public static float yBuffer = 100f;
+  public static float yBuffer = 10f;
   public static float startX = 0;
   public static float startY = 0;
 

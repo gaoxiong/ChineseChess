@@ -2,16 +2,28 @@ package com.gamezone.chess;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.util.HashMap;
 
+import static com.gamezone.chess.ViewConsts.height;
+import static com.gamezone.chess.ViewConsts.initChessViewFinal;
 import static com.gamezone.chess.ViewConsts.isNoPlaySound;
+import static com.gamezone.chess.ViewConsts.startX;
+import static com.gamezone.chess.ViewConsts.startY;
+import static com.gamezone.chess.ViewConsts.width;
+import static com.gamezone.chess.ViewConsts.xZoom;
+import static com.gamezone.chess.ViewConsts.yBuffer;
+import static com.gamezone.chess.ViewConsts.yZoom;
 
 /**
  * Created by gaoxiong on 2015/4/27.
@@ -24,17 +36,65 @@ public class GameMainViewActivity extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.main);
-    this.getActionBar().hide();
-    initSound();
 
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    getWindow().setFlags(
+      WindowManager.LayoutParams.FLAG_FULLSCREEN,
+      WindowManager.LayoutParams.FLAG_FULLSCREEN
+    );
+    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    setVolumeControlStream(AudioManager.STREAM_MUSIC);
+    setContentView(R.layout.main);
+    initSound();
+    initAds();
+
+
+    DisplayMetrics displayMetrics = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+    int tmpHeight = displayMetrics.heightPixels;
+    int tmpWidth = displayMetrics.widthPixels;
+    initScreen(tmpWidth, tmpHeight);
+  }
+
+  public void initScreen(int targetWidth, int targetHeight) {
+
+    int tmpHeight = targetHeight;
+    int tmpWidth = targetWidth;
+
+    if (tmpHeight > tmpWidth) {
+      height = tmpHeight;
+      width = tmpWidth;
+    } else {
+      height = tmpWidth;
+      width = tmpHeight;
+    }
+
+    float zoomx = width / 480;
+    float zoomy = height / 800;
+
+    if (zoomx > zoomy) {
+      xZoom = yZoom = zoomy;
+    } else {
+      xZoom = yZoom = zoomx;
+    }
+    startX = (width - 480 * xZoom) / 2;
+    startY = (height - 800 * yZoom) / 2 + yBuffer;
+    initChessViewFinal();
+  }
+
+  private void initAds() {
     AdView mAdViewTop = (AdView) findViewById(R.id.adViewTop);
     AdRequest adRequestTop = new AdRequest.Builder().build();
     mAdViewTop.loadAd(adRequestTop);
+    int topWidth = mAdViewTop.getMeasuredWidth();
+    int topHeight = mAdViewTop.getMeasuredHeight();
 
     AdView mAdViewBottom = (AdView) findViewById(R.id.adViewBottom);
     AdRequest adRequestBottom = new AdRequest.Builder().build();
     mAdViewBottom.loadAd(adRequestBottom);
+    int bottomWidth = mAdViewBottom.getMeasuredWidth();
+    int bottomHeight = mAdViewBottom.getMeasuredHeight();
   }
 
   private void initSound() {

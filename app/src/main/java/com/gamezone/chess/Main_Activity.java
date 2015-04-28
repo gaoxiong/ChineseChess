@@ -77,7 +77,7 @@ public class Main_Activity extends Activity {
       width = tmpWidth;
     } else {
       height = tmpWidth;
-      width = tmpWidth;
+      width = tmpHeight;
     }
 
     float zoomx = width / 480;

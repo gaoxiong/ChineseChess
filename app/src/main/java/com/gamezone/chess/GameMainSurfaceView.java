@@ -157,11 +157,6 @@ public class GameMainSurfaceView extends SurfaceView implements SurfaceHolder.Ca
 
   @Override
   public void surfaceCreated(SurfaceHolder holder) {
-    screenHeight = this.getHeight();
-    screenWidth = this.getWidth();
-    int surfaceViewWidth = ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getWidth();
-    int surfaceViewHeight = ((GameMainViewActivity)context).getWindowManager().getDefaultDisplay().getHeight();
-    //holder.setFixedSize(surfaceViewWidth, surfaceViewHeight);
     this.holder=holder;
     canvas = null;
     try {
