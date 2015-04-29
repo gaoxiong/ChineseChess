@@ -44,10 +44,6 @@ public class GameMainViewActivity extends Activity {
     );
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
-    setContentView(R.layout.main);
-    initSound();
-    initAds();
-
 
     DisplayMetrics displayMetrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -55,6 +51,10 @@ public class GameMainViewActivity extends Activity {
     int tmpHeight = displayMetrics.heightPixels;
     int tmpWidth = displayMetrics.widthPixels;
     initScreen(tmpWidth, tmpHeight);
+    initSound();
+
+    setContentView(R.layout.main);
+    initAds();
   }
 
   public void initScreen(int targetWidth, int targetHeight) {
